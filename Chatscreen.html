@@ -52,32 +52,35 @@
     const userInput = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
   
-    // Display the initial welcome message
     appendMessage('Hercules', '¡Bienvenido! Soy Hercules ¿En qué te puedo ayudar hoy? 😊');
+    // Mensaje de bienvenida
   
     sendButton.addEventListener('click', () => {
       const userMessage = userInput.value;
       if (userMessage.trim() !== '') {
-        appendMessage('You: ', userMessage);
+        appendMessage('You ', userMessage);
         userInput.value = '';  // Clear input
   
-        // Call the GPT-3.5 Turbo API to get the assistant's reply
+        // llamada de GPT para obtener respuesta
         fetchAssistantReply(userMessage)
-          .then(assistantReply => appendMessage('Assistant', assistantReply))
+          .then(assistantReply => appendMessage('Hercules', assistantReply))
           .catch(error => console.error('Error fetching assistant reply:', error));
       }
     });
   
-    function appendMessage(sender, message) {
-      if (sender !== 'System') {
-        const messageDiv = document.createElement('div');
-        messageDiv.innerHTML = `<strong>Hercules: </strong> ${message}`;
-        chatBox.appendChild(messageDiv);
-      }
-    }
+  function appendMessage(sender, message) {
+    const messageDiv = document.createElement('div');
+    if (sender !== 'You') {
+      messageDiv.innerHTML = `<strong>${sender}: </strong> ${message}`;
+  } else {
+    messageDiv.innerHTML = `<strong>You</strong> ${message}`;
+  }
+  chatBox.appendChild(messageDiv);
+}
+
   
     async function fetchAssistantReply(userMessage) {
-      const apiKey = 'API KEY'; // Replace with your actual OpenAI API key
+      const apiKey = 'API KEY'; 
       const apiUrl = 'https://api.openai.com/v1/chat/completions';
   
       const response = await fetch(apiUrl, {
@@ -88,7 +91,7 @@
         },
         body: JSON.stringify({
           model: 'gpt-3.5-turbo',
-          messages: [{ role: 'system', content: 'Toma el rol de un coach personal de fitness. Responderás preguntas sobre diferentes rutinas de entrenamiento, ejercicios para partes del cuerpo, formas de alimentación y recomendaciones de nutrición. Sé amable y motivador frente al usuario que vaya a hacer uso' }, { role: 'user', content: userMessage }]
+          messages: [{ role: 'system', content: 'Toma el rol de un coach personal de fitness. Tu nombre es "Hercules", responderás preguntas sobre diferentes rutinas de entrenamiento, ejercicios para partes del cuerpo, formas de alimentación y recomendaciones de nutrición. Las rutinas deben seguir la siguiente estrucutura: 3 ejercicios por musculo que se solicite entrenar, especifica sets, repeticiones y recomendaciones, si el usuario especifica no tener equipamento de gimnasio, utiliza ejercicios que no requieran equipamento (en mayor medida) y puedan ser hechos en casa. Sé amable y motivador frente al usuario que vaya a hacer uso' }, { role: 'user', content: userMessage }]
         })
       });
   
